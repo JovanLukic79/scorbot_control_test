@@ -1,0 +1,45 @@
+<launch>
+
+    <arg name="is_sim" default="false"/>
+
+
+    
+
+    <!-- Load joint controller configurations from YAML file to parameter server -->
+    <rosparam file="$(find scorbot_control_2)/config/Trajectory_controllers.yaml" command="load"/>
+
+    <!-- Load joint controller configurations from YAML file to parameter server -->
+    <rosparam file="$(find scorbot_control_2)/config/joint_state_controller.yaml" command="load"/>
+
+    <param name="robot_description" command="$(find manipulation)/description/urdf/arm_fixed_to_ground.xacro"/>
+
+   
+
+    <!-- If interfacing with the real Hardware -->
+    <group unless="$(arg is_sim)">
+
+        <node pkg="rosserial_arduino" type="serial_node.py" name="serial_interface" />
+            <param name="port" value="/dev/ttyUSB0"/>
+        <!-- Launch the angles converter service -->
+        <node pkg="scorbot_control_2" type="angle_converter.cpp" name="angles_converter_cpp" 
+            respawn="true" output="screen"/>
+
+        <!-- Launch the Hardware interface with the real robot -->
+        <node name="scorbot_interface_node" pkg="scorbot_control_2" type="scrorbot_interface.cpp" 
+            ns="scorbot" respawn="true" output="screen"/>
+    </group>
+    <!-- Load the controllers -->
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" 
+        ns="scorbot" args="joint_state_controller arm_controller gripper_controller" />
+
+    <!-- Convert joint states to TF transforms for rviz, etc -->
+
+    <!--/scorbot/joint_states-->>
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen">
+        <remap from="/joint_states" to="/scorbot/joint_states" />
+        
+    </node>
+
+    
+
+</launch>

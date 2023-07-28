@@ -1,0 +1,607 @@
+<?xml version="1.0"?>
+<robot name="scorbot" xmlns:xacro="http://wiki.ros.org/xacro">
+
+  <xacro:property name="M_PI" value="3.1415926535897931" />
+  <xacro:property name="d435_cam_width" value="0.09"/>
+  <xacro:property name="d435_cam_depth" value="0.025"/>
+  <xacro:property name="d435_cam_height" value="0.025"/>
+
+  <!--Masses values for each link-->
+  <xacro:property name="mass_base_link" value="3.5" />
+  <xacro:property name="mass_link_1" value="2.5" />
+  <xacro:property name="mass_link_2" value="1.5" />
+  <xacro:property name="mass_link_3" value="1.5" />
+  <xacro:property name="mass_link_4" value="0.8" />
+  <xacro:property name="mass_link_5" value="0.8" />
+  <xacro:property name="mass_pad1_Link" value="0.005" />
+  <xacro:property name="mass_pad2_Link" value="0.005" />
+
+  <!--Surrounding boxes values for each link-->
+  <xacro:property name="base_link_x" value="0.24" /> 
+  <xacro:property name="base_link_y" value="0.24" /> 
+  <xacro:property name="base_link_z" value="0.2274" /> 
+
+  <xacro:property name="link_1_x" value="0.205" /> 
+  <xacro:property name="link_1_y" value="0.26" /> 
+  <xacro:property name="link_1_z" value="0.17" />
+
+  <xacro:property name="link_2_x" value="0.28749" /> 
+  <xacro:property name="link_2_y" value="0.069982" /> 
+  <xacro:property name="link_2_z" value="0.169" /> 
+
+  <xacro:property name="link_3_x" value="0.289918" /> 
+  <xacro:property name="link_3_y" value="0.06" /> 
+  <xacro:property name="link_3_z" value="0.15" /> 
+
+  <xacro:property name="link_4_x" value="0.183046" /> 
+  <xacro:property name="link_4_y" value="0.073212" /> 
+  <xacro:property name="link_4_z" value="0.075543" /> 
+
+  <xacro:property name="link_5_x" value="0.06" /> 
+  <xacro:property name="link_5_y" value="0.14" /> 
+  <xacro:property name="link_5_z" value="0.238" /> 
+
+  <xacro:property name="pad1_link_x" value="0.073966" /> 
+  <xacro:property name="pad1_link_y" value="0.02" /> 
+  <xacro:property name="pad1_link_z" value="0.01" /> 
+
+  <xacro:property name="pad2_link_x" value="0.073966" /> 
+  <xacro:property name="pad2_link_y" value="0.02" /> 
+  <xacro:property name="pad2_link_z" value="0.01" />  
+  
+  <!--Inertia Calculator for a Box-->
+  <xacro:macro name="box_inertia" params="mass x y z">
+    <inertia  ixx="${mass*(y*y+z*z)/12.0}" ixy = "0" ixz = "0"
+              iyy="${mass*(x*x+z*z)/12.0}" iyz = "0"
+              izz="${mass*(x*x+y*y)/12.0}"
+    />
+  </xacro:macro>
+
+
+  <xacro:macro name="scorbot" params="prefix parent *origin">
+
+    <!-- WORLD LINK -> Used for fixing robot to Gazebo '${prefix}_base_link' -->
+    <link name="world"/>
+
+    <joint name="${prefix}_base_joint" type="fixed">
+      <xacro:insert_block name="origin"/>
+      <parent link="${parent}"/>
+      <child link="${prefix}_base_link"/>
+    </joint>
+
+    <!--BASE LINK-->
+    <!--Bounding box: 0.24 0.24 0.2274-->
+    <link name="${prefix}_base_link">
+      <inertial>
+        <origin
+          xyz="0.0 0.0 0.11"
+          rpy="0 0 0" />
+        <mass
+          value="${mass_base_link}" />
+        <xacro:box_inertia mass="${mass_base_link}" x="${base_link_x}" y="${base_link_y}" z="${base_link_z}"/>
+      </inertial>
+      <visual>
+        <geometry>
+          <mesh filename="package://manipulation/scorbot_description/meshes/visual/Parte_1(1).DAE"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://manipulation/scorbot_description/meshes/visual/Parte_1(1).DAE"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <!--Link 1 SHOULDER LINK-->
+    <!--Bounding box: 0.205 0.26 0.17-->
+    <link name="${prefix}_link_1">
+      <inertial>
+        <origin
+          xyz="0.0 0.0 0.075"
+          rpy="0 0 0" />
+        <mass
+          value="${mass_link_1}" />
+        <xacro:box_inertia mass="${mass_link_1}" x="${link_1_x}" y="${link_1_y}" z="${link_1_z}"/>
+      </inertial>
+      <visual>
+        <geometry>
+          <mesh filename="package://manipulation/scorbot_description/meshes/visual/Parte_2(1)x.DAE"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://manipulation/scorbot_description/meshes/visual/Parte_2(1)x.DAE"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <!--Joint 1 BASE JOINT-->
+    <joint name="${prefix}_joint_1" type="revolute">
+      <parent link="${prefix}_base_link"/>
+      <child link="${prefix}_link_1"/>
+      <origin xyz="0 0 0.2274" rpy="0 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="-3.1415926535897931" upper="3.1415926535897931" effort="1000" velocity="2"/>
+    </joint>
+
+
+    <!--Link 2 ELBOW LINK--> 
+    <!-- Bounding box: 0.28749 0.069982 0.169 -->
+    <link name="${prefix}_link_2">
+      <inertial>
+        <origin
+          xyz="0.11 0.0 0.0"
+          rpy="0 0 0" />
+        <mass
+          value="${mass_link_2}" />
+        <xacro:box_inertia mass="${mass_link_2}" x="${link_2_x}" y="${link_2_y}" z="${link_2_z}"/>
+      </inertial>
+      <visual>
+        <geometry>
+          <mesh filename="package://manipulation/scorbot_description/meshes/visual/Parte_3(2)x.DAE"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://manipulation/scorbot_description/meshes/visual/Parte_3(2)x.DAE"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <!--Joint 2 SHOULDER JOINT-->
+    <joint name="${prefix}_joint_2" type="revolute">
+      <parent link="${prefix}_link_1"/>
+      <child link="${prefix}_link_2"/>
+      <origin xyz="0.0255 0 0.13" rpy="-1.570796327 -1.570796327 0"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="-0.610865" upper="2.268928" effort="1000" velocity="2"/>
+      <!-- <dynamics
+        damping="0.0"
+        friction="0.5" /> -->
+    </joint> 
+
+    <!--Link 3 PITCH LINK-->
+    <!-- Bounding box: 0.289918 0.06 0.15 -->
+    <link name="${prefix}_link_3">
+      <inertial>
+        <origin
+          xyz="0.12 0.0 0.0"
+          rpy="0 0 0" />
+        <mass
+          value="${mass_link_3}" />
+        <xacro:box_inertia mass="${mass_link_3}" x="${link_3_x}" y="${link_3_y}" z="${link_3_z}"/>
+      </inertial>
+      <visual>
+        <geometry>
+          <mesh filename="package://manipulation/scorbot_description/meshes/visual/Parte_4x.DAE"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://manipulation/scorbot_description/meshes/visual/Parte_4x.DAE"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <!--Joint 3 ELBOW JOINT-->
+    <joint name="${prefix}_joint_3" type="revolute">
+      <parent link="${prefix}_link_2"/>
+      <child link="${prefix}_link_3"/>
+      <origin xyz="0.2225 0 0" rpy="0 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="-2.268928" upper="2.268928" effort="1000" velocity="2"/>
+      <!-- <dynamics
+        damping="0.0"
+        friction="0.5" /> -->
+    </joint>
+
+    <!--Link 4 ROLL LINK-->
+    <!-- Bounding box: 0.183046 0.073212 0.075543 -->
+    <link name="${prefix}_link_4">
+      <inertial>
+        <origin
+          xyz="-0.04 0.0 0.0"
+          rpy="0 0 0" />
+        <mass
+          value="${mass_link_4}" />
+        <xacro:box_inertia mass="${mass_link_4}" x="${link_4_x}" y="${link_4_y}" z="${link_4_z}"/>
+      </inertial>
+      <visual>
+        <origin rpy="0 0 0" xyz="0.012 0 0"/>
+        <geometry>
+          <mesh filename="package://manipulation/scorbot_description/meshes/visual/Parte_6x.DAE"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://manipulation/scorbot_description/meshes/visual/Parte_6x.DAE"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <!--Joint 4 PITCH JOINT-->
+    <joint name="${prefix}_joint_4" type="revolute">
+      <parent link="${prefix}_link_3"/>
+      <child link="${prefix}_link_4"/>
+      <origin xyz="0.2225 0 0" rpy="0 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="-2.268928" upper="2.268928" effort="1000" velocity="2"/>
+      <!-- <dynamics
+        damping="0.0"
+        friction="0.5" /> -->
+    </joint>
+
+    <!--Link 5 GRIPPER LINK-->
+    <!-- Bounding box: 0.06 0.14 0.238 -->
+    <link name="${prefix}_link_5">
+      <inertial>
+        <origin
+          xyz="0.0 0.0 0.02"
+          rpy="0 0 0" />
+        <mass
+          value="${mass_link_5}" />" />
+        <xacro:box_inertia mass="${mass_link_5}" x="${link_5_x}" y="${link_5_y}" z="${link_5_z}"/>
+      </inertial>
+      <visual>
+        <origin
+          xyz="0 0 0"
+          rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://manipulation/scorbot_description/meshes/gripper_Link.STL" />
+        </geometry>
+        <material
+          name="">
+          <color
+          rgba="0.1 0.1 0.1 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://manipulation/scorbot_description/meshes/gripper_Link.STL" />
+        </geometry>
+      </collision>
+    </link>
+
+    <!--Joint 5 ROLL JOINT-->
+    <joint name="${prefix}_joint_5" type="revolute">
+      <parent link="${prefix}_link_4"/>
+      <child link="${prefix}_link_5"/>
+      <origin xyz="0 0 0" rpy="0.0 -1.570796327 0.0" />
+      <axis xyz="0 0 1"/>
+      <limit
+        lower="-3.14159"
+        upper="3.14159"
+        effort="1000"
+        velocity="2" />
+      <!-- <dynamics damping="0.01" friction="0.5" /> -->
+    </joint>
+
+
+    <!--PAD1 LINK-->
+    <!-- Bounding box: 0.073966 0.02 0.01 -->
+    <link name="${prefix}_pad1_Link">
+      <inertial>
+        <origin
+          xyz="-0.035 0.0 0.0"
+          rpy="0 0 0" />
+        <mass
+          value="${mass_pad1_Link}" />
+        <xacro:box_inertia mass="${mass_pad1_Link}" x="${pad1_link_x}" y="${pad1_link_y}" z="${pad1_link_z}"/>
+      </inertial>
+      <visual>
+        <origin
+          xyz="0 0 0"
+          rpy="0 0 0" />
+        <geometry>
+          <mesh
+            filename="package://manipulation/scorbot_description/meshes/pad1_Link.STL" />
+        </geometry>
+        <material
+          name="">
+          <color
+          rgba="0.1 0 0 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin
+          xyz="0 0 0"
+          rpy="0 0 0" />
+        <geometry>
+          <mesh
+            filename="package://manipulation/scorbot_description/meshes/pad1_Link.STL" />
+        </geometry>
+      </collision>
+    </link>
+
+    <!--PAD1 JOINT-->
+    <joint  name="${prefix}_pad1_joint" type="revolute">
+      <origin xyz="0 -0.0545 -0.0905" rpy="1.5708 -0.74758 -1.5708" />
+      <parent link="${prefix}_link_5" />
+      <child link="${prefix}_pad1_Link" />
+      <axis xyz="0 0 1" />
+      <limit
+        lower="0"
+        upper="1.5709"
+        effort="1000"
+        velocity="2" />
+      <!-- <dynamics damping="0.01" friction="0.01" /> -->
+    </joint>
+
+    <!--PAD2 LINK-->
+    <!-- Bounding box: 0.073966 0.02 0.01 -->
+    <link name="${prefix}_pad2_Link">
+      <inertial>
+        <origin
+          xyz="-0.035 0.0 0.0"
+          rpy="0 0 0" />
+        <mass
+          value="${mass_pad2_Link}" />
+        <xacro:box_inertia mass="${mass_pad2_Link}" x="${pad2_link_x}" y="${pad2_link_y}" z="${pad2_link_z}"/>
+      </inertial>
+      <visual>
+        <origin
+          xyz="0 0 0"
+          rpy="0 0 0" />
+        <geometry>
+          <mesh
+            filename="package://manipulation/scorbot_description/meshes/pad2_Link.STL" />
+        </geometry>
+        <material
+          name="">
+          <color
+          rgba="0.1 0 0 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin
+          xyz="0 0 0"
+          rpy="0 0 0" />
+        <geometry>
+          <mesh
+            filename="package://manipulation/scorbot_description/meshes/pad2_Link.STL" />
+        </geometry>
+      </collision>
+    </link>
+
+    <!--PAD2 JOINT-->
+    <joint name="${prefix}_pad2_joint" type="revolute">
+      <origin xyz="0 0.0545 -0.0905" rpy="-1.5708 -0.74758 1.5708" />
+      <parent link="${prefix}_link_5" />
+      <child link="${prefix}_pad2_Link" />
+      <axis xyz="0 0 -1" />
+      <limit
+        lower="0"
+        upper="1.5709"
+        effort="1000"
+        velocity="2" />
+      <!-- <dynamics damping="0.01" friction="0.01" /> -->
+      <mimic joint="${prefix}_pad1_joint" multiplier="1.0" offset="0"/>
+    </joint>
+
+    <!-- Camera -->
+    <!-- Bounding box: 0.089914 0.025 0.025055 -->
+    <!-- <link name="camera_link">
+      <inertial>
+        <mass value="0.001"/>
+        <origin xyz="0.0 0.0 -0.05" rpy="0 0 0"/>
+        <inertia
+          ixx="1.0439608541666666e-07" ixy="0.0" ixz="0.0"
+          iyy="7.260233684166666e-07" iyz="0.0"
+          izz="7.257939496666667e-07"
+          />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://rover_autonav/meshes/d435.dae"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <box size="${d435_cam_width} ${d435_cam_depth} ${d435_cam_height}"/>
+        </geometry>
+      </collision>
+    </link> -->
+
+    <!-- Camera Joint -->
+    <!-- <joint name="camera_joint" type="fixed">
+      <origin xyz="0.0 -0.07 0.0" rpy="${M_PI} 0 0" />
+      <parent link="${prefix}_link_5"/>
+      <child link="camera_link" />
+    </joint> -->
+
+    <!-- camera depth joints and links DONT INCLUDE STAY COMMENTED !!!!-->
+    <!-- <joint name="camera_depth_joint" type="fixed">
+      <origin xyz="${r430_cam_depth_px} ${r430_cam_depth_py} ${r430_cam_depth_pz}" rpy="0 0 0"/>
+      <parent link="camera_link"/>
+      <child link="camera_depth_frame" />
+    </joint>
+
+    <link name="camera_depth_frame"/> -->
+
+
+    <!-- Camera oriented -->
+    <!-- <joint name="camera_link_oriented_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="0 ${-M_PI/2} ${-M_PI/2}" />
+      <parent link="camera_link" />
+      <child link="camera_link_oriented" />
+    </joint>
+
+    <link name="camera_link_oriented"/> -->
+
+
+    <!-- Camera Depth Optical Frame -->
+    <!-- <joint name="camera_depth_optical_frame_joint" type="fixed">
+      <origin xyz="0 -0.0115 0" rpy="${-M_PI/2} 0 ${-M_PI/2}" />
+      <parent link="camera_link_oriented" />
+      <child link="camera_depth_optical_frame" />
+    </joint>
+
+    <link name="camera_depth_optical_frame"/> -->
+
+
+    <!-- Camera plugin -->
+    <!-- <gazebo reference="camera_link_oriented">
+      <sensor type="depth" name="camera_depth_sensor">
+        <always_on>true</always_on>
+        <update_rate>15.0</update_rate>
+        <camera>
+          <horizontal_fov>${91.2*M_PI/180.0}</horizontal_fov>
+          <image>
+            <format>R8G8B8</format>
+            <width>640</width>
+            <height>480</height>
+          </image>
+          <clip>
+            <near>0.3</near>
+            <far>5.0</far>
+          </clip>
+        </camera>
+        <plugin name="camera_plugin" filename="libgazebo_ros_openni_kinect.so">
+          <cameraName>front_rgbd_camera</cameraName>
+          <alwaysOn>true</alwaysOn>
+          <updateRate>10</updateRate>
+          <imageTopicName>rgb/image_raw</imageTopicName>
+          <depthImageTopicName>depth/image_raw</depthImageTopicName>
+          <pointCloudTopicName>depth/points</pointCloudTopicName>
+          <cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
+          <depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
+          <frameName>camera_depth_optical_frame</frameName>
+          <baseline>0.1</baseline>
+          <distortion_k1>0.0</distortion_k1>
+          <distortion_k2>0.0</distortion_k2>
+          <distortion_k3>0.0</distortion_k3>
+          <distortion_t1>0.0</distortion_t1>
+          <distortion_t2>0.0</distortion_t2>
+          <pointCloudCutoff>0.1</pointCloudCutoff>
+        </plugin>
+      </sensor>
+    </gazebo> -->
+
+
+    <!--Transmission Base -->
+    <transmission name="baseTransmission">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${prefix}_joint_1" type="SimpleTransmission">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="base_motor">
+        <machanicalReduction>1</machanicalReduction>
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+    <!--Transmission Shoulder-->
+    <transmission name="shoulderTransmission">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${prefix}_joint_2" type="SimpleTransmission">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="shoulder_motor">
+        <machanicalReduction>1</machanicalReduction>
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+    <!--Transmission Elbow-->
+    <transmission name="elbowTransmission">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${prefix}_joint_3" type="SimpleTransmission">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="elbow_motor">
+        <machanicalReduction>1</machanicalReduction>
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+    <!--Transmission Pitch-->
+    <transmission name="pitchTransmission">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${prefix}_joint_4" type="SimpleTransmission">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="pitch_motor">
+        <machanicalReduction>1</machanicalReduction>
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+    <!--Transmission Roll-->
+    <transmission name="pitchTransmission">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${prefix}_joint_5" type="SimpleTransmission">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="pitch_motor">
+        <machanicalReduction>1</machanicalReduction>
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+    <!-- Transmission pad1-->
+
+    <transmission name="pad1Transmission">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${prefix}_pad1_joint" >
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="pad1_motor">
+        <mechanicalReduction>1</mechanicalReduction>
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+
+    <!-- Gazebo plugin for ROS Control -->
+    <gazebo>
+      <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+          <!-- <robotNamespace>/scorbot</robotNamespace> -->
+      </plugin>
+    </gazebo>
+
+    <!-- Gazebo plugin MIMIC JOINT-->
+    <!-- <robotNamespace>/scorbot</robotNamespace> -->
+    <gazebo>
+      <plugin name="mimic_pad1_joint" filename="libroboticsgroup_gazebo_mimic_joint_plugin.so">
+        <joint>${prefix}_pad1_joint</joint>
+        <mimicJoint>${prefix}_pad2_joint</mimicJoint>
+        <hasPID />
+        <multiplier>1.0</multiplier>
+        <offset>0</offset>
+        <sensitiveness>0.0</sensitiveness>
+        <maxEffort>100.0</maxEffort>
+      </plugin>
+    </gazebo>
+
+    <!-- Gazebo plugin Grasp-->
+    <gazebo>
+      <plugin name="gazebo_grasp_fix" filename="libgazebo_grasp_fix.so">
+        <arm>
+            <arm_name>ur_manipulator</arm_name>
+            <palm_link>${prefix}_link_5</palm_link>
+            <gripper_link>${prefix}_pad1_Link</gripper_link>
+            <gripper_link>${prefix}_pad2_Link</gripper_link>
+        </arm>
+        <forces_angle_tolerance>90</forces_angle_tolerance>
+        <update_rate>10</update_rate>
+        <grip_count_threshold>1</grip_count_threshold>
+        <max_grip_count>20</max_grip_count>
+        <release_tolerance>0.03</release_tolerance>
+        <disable_collisions_on_attach>true</disable_collisions_on_attach>
+        <contact_topic>__default_topic__</contact_topic>
+      </plugin>
+    </gazebo>
+
+
+
+  </xacro:macro>
+
+</robot>

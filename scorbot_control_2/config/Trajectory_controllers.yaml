@@ -1,0 +1,18 @@
+scorbot:
+
+  # Arm Trajectory Controllers ---------------------------------------
+  arm_controller:
+    type: "position_controllers/JointTrajectoryController"
+    joints:
+        - base_motor1
+        - link1_motor2
+        - link2_motor3
+        - rotgrip_motor4
+        - rotgrip_motor5
+
+
+  # Gripper Trajectory Controllers ---------------------------------------
+  gripper_controller:
+    type: "position_controllers/JointTrajectoryController"
+    joints:
+      - gripper_motor6

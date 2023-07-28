@@ -1,0 +1,15 @@
+# Request
+float64 base_motor1
+float64 link1_motor2
+float64 link2_motor3
+float64 rotgrip_motor4
+float64 rotgrip_motor5
+
+---
+
+# Response
+float64 base_motor1
+float64 link1_motor2
+float64 link2_motor3
+float64 rotgrip_motor4
+float64 rotgrip_motor5

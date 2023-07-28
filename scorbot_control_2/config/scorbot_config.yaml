@@ -1,0 +1,108 @@
+#pulled from rrbot_control > generic_hardware)control_loop  
+
+generic_hw_control_loop:
+  loop_hz: 200
+  cycle_time_error_threshold: 0.01
+
+#Settings for ros_control hardware interface (used in generic_hw_interface.cpp)
+hardware_interface:
+  joints:
+        - base_motor1
+        - link1_motor2
+        - link2_motor3
+        - rotgrip_motor4
+        - rotgrip_motor5
+        
+          #publish all joint states
+                     #creates the /joint_state topic necessary in ROS
+joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 200
+
+    #JOint trajectoyr controller
+        #for detailed explination of the parameter http://wiki.ros.org/joint_trajectory_controller
+
+
+
+# Publish all joint states ----------------------------------
+# Creates the /joint_states topic necessary in ROS
+joint_state_controller:
+   type:         joint_state_controller/JointTrajectoryController
+   publish_rate: 50
+
+# Effort Trajectory Controller -------------------------------
+# For detailed explanations of parameter see http://wiki.ros.org/joint_trajectory_controller
+effort_trajectory_controller:
+   type: effort_controllers/JointTrajectoryController
+   # These joints can likely just be copied from the hardware_interface list above
+   joints:
+        - base_motor1
+        - link1_motor2
+        - link2_motor3
+        - rotgrip_motor4
+        - rotgrip_motor5
+   constraints:
+      goal_time: 10.0
+      stopped_position_tolerance: 0.4 # Defaults to 0.01
+      joint_1:
+          trajectory: 0.30
+          goal:       0.10
+      joint_2:
+          trajectory: 0.30
+          goal:       0.10
+      joint_3:
+          trajectory: 0.30
+          goal:       0.10
+      joint_4:
+          trajectory: 0.30
+          goal:       0.10
+      joint_5:
+          trajectory: 0.30
+          goal:       0.10                    
+   gains:
+       joint_1: {p: 20.0,  i: 0.0, d: 0.1, i_clamp: 1}
+       joint_2: {p: 20.0,  i: 0.0, d: 0.1, i_clamp: 1}
+       joint_3: {p: 20.0,  i: 0.0, d: 0.1, i_clamp: 1}
+       joint_4: {p: 20.0,  i: 0.0, d: 0.1, i_clamp: 1}
+       joint_5: {p: 20.0,  i: 0.0, d: 0.1, i_clamp: 1}
+
+    # state_publish_rate:  50 # Defaults to 50
+    # action_monitor_rate: 20 # Defaults to 20
+    #hold_trajectory_duration: 0 # Defaults to 0.5
+
+# Individual Position Controllers ---------------------------------------
+# Allows to send individual ROS msg of Float64 to each joint separately
+joint_1:
+   type: position_controllers/JointPositionController
+   joint: base_motor1
+   pid: {p: 100.0, i: 0.01, d: 10.0}
+joint_2:
+   type: position_controllers/JointPositionController
+   joint: link1_motor2
+   pid: {p: 100.0, i: 0.01, d: 10.0}
+joint_3:
+   type: position_controllers/JointPositionController
+   joint: link2_motor3
+   pid: {p: 100.0, i: 0.01, d: 10.0}
+joint_4:
+   type: position_controllers/JointPositionController
+   joint: rotgrip_motor4
+   pid: {p: 100.0, i: 0.01, d: 10.0}
+joint_5:
+   type: position_controllers/JointPositionController
+   joint: rotgrip_motor5
+   pid: {p: 100.0, i: 0.01, d: 10.0}
+
+
+
+joint_position_controller: 
+  type: position_controllers/JointGroupPositionController
+
+     #joints copied from hardware_interfdace list 
+  joints:     
+        - base_motor1
+        - link1_motor2
+        - link2_motor3
+        - rotgrip_motor4
+        - rotgrip_motor5
+        

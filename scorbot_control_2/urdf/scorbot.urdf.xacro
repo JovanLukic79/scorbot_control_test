@@ -1,0 +1,317 @@
+<?xml version="1.0"?>
+<robot name="scorbot" xmlns:xacro="http://wiki.ros.org/xacro">
+
+  <xacro:property name="M_PI" value="3.1415926535897931" />
+
+  <xacro:macro name="scorbot" params="prefix parent *origin">
+  
+    <!-- Used for fixing robot to Gazebo 'base_link' -->
+    <!-- <link name="world"/>
+
+    <joint name="fixed" type="fixed">
+      <parent link="world"/>
+      <child link="base_link"/>
+    </joint> -->
+
+    <joint name="${prefix}_base_joint" type="fixed">
+      <xacro:insert_block name="origin"/>
+      <parent link="${parent}"/>
+      <child link="${prefix}_base_link"/>
+    </joint>
+
+    <!--BASE LINK-->
+    <link name="${prefix}_base_link">
+      <inertial>
+        <origin
+          xyz="0.13275 0.14932 0.15353"
+          rpy="0 0 0" />
+        <mass
+          value="13.939" />
+        <inertia
+          ixx="0.10125"
+          ixy="-0.00021844"
+          ixz="-0.00033793"
+          iyy="0.087972"
+          iyz="0.0034335"
+          izz="0.095961" />
+      </inertial>
+      <visual>
+        <geometry>
+          <mesh filename="package://manipulation/scorbot_description/meshes/visual/Parte_1(1).DAE"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://manipulation/scorbot_description/meshes/visual/Parte_1(1).DAE"/>
+        </geometry>
+      </collision> 
+    </link>
+
+    <!--Link 1 SHOULDER LINK-->
+    <link name="${prefix}_link_1">
+      <inertial>
+        <origin
+          xyz="0.13275 0.14932 0.15353"
+          rpy="0 0 0" />
+        <mass
+          value="13.939" />
+        <inertia
+          ixx="0.10125"
+          ixy="-0.00021844"
+          ixz="-0.00033793"
+          iyy="0.087972"
+          iyz="0.0034335"
+          izz="0.095961" />
+      </inertial>
+      <visual>
+        <geometry>
+          <mesh filename="package://manipulation/scorbot_description/meshes/visual/Parte_2(1)x.DAE"/>
+        </geometry>
+      </visual> 
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://manipulation/scorbot_description/meshes/visual/Parte_2(1)x.DAE"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <!--Joint 1 BASE JOINT-->
+    <joint name="${prefix}_joint_1" type="revolute">
+      <parent link="${prefix}_base_link"/>
+      <child link="${prefix}_link_1"/>
+      <origin xyz="0 0 0.2274" rpy="0 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="-1.57" upper="1.57" effort="0" velocity="2"/>
+    </joint>
+
+    <!--Link 2 ELBOW LINK-->
+    <link name="${prefix}_link_2">
+      <inertial>
+        <origin
+          xyz="0.13275 0.14932 0.15353"
+          rpy="0 0 0" />
+        <mass
+          value="0.01" />
+        <inertia
+          ixx="0.069345"
+          ixy="0.00053463"
+          ixz="-9.59E-05"
+          iyy="0.09864"
+          iyz="0.0061367"
+          izz="0.10261" />
+    </inertial>
+      <visual>
+        <geometry>
+          <mesh filename="package://manipulation/scorbot_description/meshes/visual/Parte_3(2)x.DAE"/>
+        </geometry>
+      </visual> 
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://manipulation/scorbot_description/meshes/visual/Parte_3(2)x.DAE"/>
+        </geometry>
+      </collision>
+    </link>
+    
+    <!--Joint 2 SHOULDER JOINT-->
+    <joint name="${prefix}_joint_2" type="revolute">
+      <parent link="${prefix}_link_1"/>
+      <child link="${prefix}_link_2"/>
+      <origin xyz="0.0255 0 0.13" rpy="-1.570796327 -1.570796327 0"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="-1.57" upper="1.57" effort="0" velocity="0.5"/>
+      <dynamics
+        damping="0.0"
+        friction="0.01" />
+    </joint>
+
+    <!--Link 3 PITCH LINK-->
+    <link name="${prefix}_link_3">
+      <inertial>
+        <origin
+          xyz="0.13275 0.14932 0.15353"
+          rpy="0 0 0" />
+        <mass
+          value="0.001" />
+        <inertia
+          ixx="0.021626"
+          ixy="-8.9392E-17"
+          ixz="2.0553E-15"
+          iyy="0.013632"
+          iyz="-2.3367E-05"
+          izz="0.033242" />
+    </inertial>
+      <visual>
+        <geometry>
+          <mesh filename="package://manipulation/scorbot_description/meshes/visual/Parte_4x.DAE"/>
+        </geometry>
+      </visual> 
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://manipulation/scorbot_description/meshes/visual/Parte_4x.DAE"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <!--Joint 3 ELBOW JOINT-->
+    <joint name="${prefix}_joint_3" type="revolute">
+      <parent link="${prefix}_link_2"/>
+      <child link="${prefix}_link_3"/>
+      <origin xyz="0.2225 0 0" rpy="0 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="-1.57" upper="1.57" effort="0" velocity="0.5"/>
+    </joint>
+
+    <!--Link 4 ROLL LINK-->
+    <link name="${prefix}_link_4">
+      <inertial>
+        <origin
+          xyz="0.13275 0.14932 0.15353"
+          rpy="0 0 0" />
+        <mass
+          value="0.001" />
+        <inertia
+          ixx="0.027436"
+          ixy="-1.1652E-13"
+          ixz="-1.6685E-15"
+          iyy="0.0081405"
+          iyz="0.00011392"
+          izz="0.034105" />
+    </inertial>
+      <visual>
+        <origin rpy="0 0 0" xyz="0.012 0 0"/>
+        <geometry>
+          <mesh filename="package://manipulation/scorbot_description/meshes/visual/Parte_6x.DAE"/>
+        </geometry>
+      </visual> 
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://manipulation/scorbot_description/meshes/visual/Parte_6x.DAE"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <!--Joint 4 PITCH JOINT-->
+    <joint name="${prefix}_joint_4" type="revolute">
+      <parent link="${prefix}_link_3"/>
+      <child link="${prefix}_link_4"/>
+      <origin xyz="0.2225 0 0" rpy="0 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="-1.57" upper="1.57" effort="0" velocity="0.5"/>
+      <dynamics
+        damping="0.01"
+        friction="0.01" />
+    </joint>
+
+    <!--Link 5 GRIPPER LINK-->
+    <link name="${prefix}_link_5">
+      <inertial>
+        <origin
+          xyz="0.13275 0.14932 0.15353"
+          rpy="0 0 0" />
+        <mass
+          value="0.1" />
+        <inertia
+          ixx="0.00036556"
+          ixy="-7.8517E-13"
+          ixz="7.4017E-07"
+          iyy="0.00036398"
+          iyz="-2.2678E-13"
+          izz="6.7274E-05" />
+    </inertial>
+      <visual>
+        <geometry>
+          <mesh filename="package://manipulation/scorbot_description/meshes/visual/Parte_5xb.DAE"/>
+        </geometry>
+      </visual> 
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://manipulation/scorbot_description/meshes/visual/Parte_5xb.DAE"/>
+        </geometry>
+      </collision>
+    </link>
+    <!--Joint 5 ROLL JOINT-->
+    <joint name="${prefix}_joint_5" type="revolute">
+      <parent link="${prefix}_link_4"/>
+      <child link="${prefix}_link_5"/>
+      <origin xyz="0 0 0" rpy="0 1.570796327 0"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="-1.57" upper="1.57" effort="0" velocity="0.5"/>
+    </joint>
+
+    <!--Transmission Base -->
+    <transmission name="baseTransmission">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${prefix}_joint_1" type="SimpleTransmission">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="base_motor">
+        <machanicalReduction>1</machanicalReduction>
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+    <!--Transmission Shoulder-->
+    <transmission name="shoulderTransmission">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${prefix}_joint_2" type="SimpleTransmission">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="shoulder_motor">
+        <machanicalReduction>1</machanicalReduction>
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+    <!--Transmission Elbow-->
+    <transmission name="elbowTransmission">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${prefix}_joint_3" type="SimpleTransmission">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="elbow_motor">
+        <machanicalReduction>1</machanicalReduction>
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+    <!--Transmission Pitch-->
+    <transmission name="pitchTransmission">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${prefix}_joint_4" type="SimpleTransmission">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="pitch_motor">
+        <machanicalReduction>1</machanicalReduction>
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+    <!--Transmission Roll-->
+    <transmission name="pitchTransmission">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${prefix}_joint_5" type="SimpleTransmission">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="pitch_motor">
+        <machanicalReduction>1</machanicalReduction>
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </actuator>
+    </transmission>
+
+    <!-- Gazebo plugin for ROS Control -->
+    <gazebo>
+        <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+            <!-- <robotNamespace>/scorbot</robotNamespace> -->
+        </plugin>
+    </gazebo>
+
+
+  </xacro:macro>
+
+</robot>
